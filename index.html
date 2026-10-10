@@ -809,15 +809,15 @@
                 </div>
             </div>
 
-            <form class="form-identitas" id="formIdentitas" onsubmit="mulaiTryout(event)">
+            <form class="form-identitas" id="formIdentitas" onsubmit="mulaiTryout(event)" autocomplete="off">
                 <label><i class="fas fa-user"></i> Nama Lengkap</label>
-                <input type="text" id="inputNama" placeholder="Masukkan nama Anda..." required>
+                <input type="text" id="inputNama" placeholder="Masukkan nama Anda..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
                 <label><i class="fas fa-school"></i> Asal Sekolah</label>
-                <input type="text" id="inputSekolah" placeholder="Nama sekolah..." required>
+                <input type="text" id="inputSekolah" placeholder="Nama sekolah..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
                 <label><i class="fas fa-map-marker-alt"></i> Kabupaten/Kota</label>
-                <input type="text" id="inputKabupaten" placeholder="Kabupaten/Kota...">
+                <input type="text" id="inputKabupaten" placeholder="Kabupaten/Kota..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 <label><i class="fas fa-map"></i> Provinsi</label>
-                <input type="text" id="inputProvinsi" placeholder="Provinsi...">
+                <input type="text" id="inputProvinsi" placeholder="Provinsi..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 <button type="submit" class="btn-mulai"><i class="fas fa-play"></i> MULAI TRY OUT</button>
             </form>
         </div>
@@ -1246,6 +1246,7 @@
         var sudahDiperingatkan = false;
         var ujianSedangBerjalan = false;
 
+        // Bersihkan SEMUA data lama agar form benar-benar kosong setiap dibuka
         localStorage.removeItem('progress_fisika2026');
         localStorage.removeItem('identitas_nama');
         localStorage.removeItem('identitas_sekolah');
@@ -1757,6 +1758,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('halamanIdentitas').classList.remove('hidden');
             document.getElementById('halamanTryout').classList.add('hidden');
+
+            // Pastikan form identitas KOSONG setiap kali halaman dibuka
+            var ids = ['inputNama', 'inputSekolah', 'inputKabupaten', 'inputProvinsi'];
+            ids.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.value = '';
+            });
         });
     </script>
 </body>
