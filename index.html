@@ -262,7 +262,8 @@
         .soal-gambar { margin-bottom: 15px; text-align: center; }
         .soal-gambar img {
             max-width: 100%; border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: block; margin: 0 auto;
         }
         .soal-gambar .placeholder {
             display: block; color: rgba(255, 255, 255, 0.3);
@@ -1241,9 +1242,6 @@
         var totalSoal = soalData.length;
         var timer = null;
 
-        // ================================================================
-        // VARIABEL DETEKSI KECURANGAN
-        // ================================================================
         var jumlahKeluar = 0;
         var sudahDiperingatkan = false;
         var ujianSedangBerjalan = false;
@@ -1257,30 +1255,22 @@
         localStorage.removeItem('benar_fisika2026');
         localStorage.removeItem('jumlah_keluar_fisika2026');
 
-        // ================================================================
-        // DETEKSI KECURANGAN - Page Visibility API
-        // ================================================================
         document.addEventListener('visibilitychange', function() {
-            // Hanya pantau saat ujian sedang berjalan
             if (!ujianSedangBerjalan) return;
 
             if (document.visibilityState === 'hidden') {
-                // Siswa meninggalkan halaman ujian
                 jumlahKeluar++;
                 localStorage.setItem('jumlah_keluar_fisika2026', jumlahKeluar);
                 console.log('Siswa keluar dari halaman ujian. Total: ' + jumlahKeluar);
-                // Update counter di sidebar jika ada
                 var counterEl = document.getElementById('counterKeluar');
                 if (counterEl) counterEl.textContent = jumlahKeluar;
             } else if (document.visibilityState === 'visible') {
-                // Siswa kembali ke halaman
                 if (jumlahKeluar > 0) {
                     tampilkanPeringatanKeluar();
                 }
             }
         });
 
-        // Peringatan sebelum keluar halaman (close/refresh)
         window.addEventListener('beforeunload', function(e) {
             if (!ujianSedangBerjalan) return;
             var pesan = 'Anda sedang dalam ujian. Yakin ingin keluar? Semua jawaban yang belum tersimpan akan hilang.';
@@ -1288,11 +1278,7 @@
             return pesan;
         });
 
-        // ================================================================
-        // TAMPILKAN PERINGATAN KECURANGAN
-        // ================================================================
         function tampilkanPeringatanKeluar() {
-            // Hapus overlay lama jika ada
             var oldOverlay = document.getElementById('overlayKeluar');
             if (oldOverlay) oldOverlay.remove();
 
@@ -1310,7 +1296,7 @@
 
             overlay.innerHTML =
                 '<div style="background:#1a1a3e;border:3px solid ' + warnaBorder + ';border-radius:20px;padding:30px;max-width:420px;width:100%;text-align:center;color:#fff;box-shadow:0 0 50px rgba(255,101,132,0.5);">' +
-                    '<div style="font-size:3rem;margin-bottom:15px;animation:pulseHint 1.5s ease-in-out infinite;">⚠️</div>' +
+                    '<div style="font-size:3rem;margin-bottom:15px;animation:pulseHint 1.5s ease-in-out infinite;">!</div>' +
                     '<h2 style="color:' + warnaJudul + ';margin-bottom:18px;font-weight:900;letter-spacing:1px;font-size:1.2rem;">' + judul + '</h2>' +
                     '<p style="font-size:0.9rem;line-height:1.7;margin-bottom:25px;color:rgba(255,255,255,0.9);">' + pesan + '</p>' +
                     '<button onclick="document.getElementById(\'overlayKeluar\').remove()" ' +
@@ -1338,7 +1324,6 @@
             renderSoal();
             timer = new Timer(DURASI_MENIT);
             timer.start();
-            // Aktifkan deteksi kecurangan
             ujianSedangBerjalan = true;
             return false;
         }
@@ -1375,10 +1360,15 @@
                 html += '<div class="soal-teks"><p>' + soal.soal + '</p></div>';
 
                 if (soal.gambar) {
-                    html += '<div class="soal-gambar"><div class="placeholder">' +
-                        '<i class="fas fa-image"></i> Tempat unggah gambar soal ' + nomor + '<br>' +
+                    html += '<div class="soal-gambar">' +
+                        '<img src="' + soal.gambar + '" alt="Gambar soal ' + nomor + '" ' +
+                        'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';" ' +
+                        'style="max-width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.1);display:block;margin:0 auto;">' +
+                        '<div class="placeholder" style="display:none;">' +
+                        '<i class="fas fa-image"></i> Gambar tidak ditemukan<br>' +
                         '<code>' + soal.gambar + '</code>' +
-                        '</div></div>';
+                        '</div>' +
+                        '</div>';
                 }
 
                 if (soal.soalLanjutan) html += '<div class="soal-teks"><p>' + soal.soalLanjutan + '</p></div>';
@@ -1622,7 +1612,6 @@
             if (answered < totalSoal) {
                 if (!confirm('Anda baru menjawab ' + answered + ' dari ' + totalSoal + ' soal. Yakin ingin mengumpulkan?')) return;
             }
-            // Matikan deteksi sebelum submit agar tidak memicu beforeunload
             ujianSedangBerjalan = false;
             document.getElementById('loading').style.display = 'flex';
 
@@ -1685,7 +1674,6 @@
             ucapEl.textContent = ucapan;
             ucapEl.className = kelas;
 
-            // Tampilkan peringatan kecurangan jika ada
             var peringatanEl = document.getElementById('peringatanKecurangan');
             if (jumlahKeluar > 0) {
                 peringatanEl.style.display = 'flex';
